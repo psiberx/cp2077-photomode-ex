@@ -1,3 +1,5 @@
+module PhotoModeEx
+
 @wrapMethod(PhotoModePlayerEntityComponent)
 private final func EquipWeaponOfThisType(typesList: array<gamedataItemType>) -> Void {
     this.ListAllCurrentItems();
