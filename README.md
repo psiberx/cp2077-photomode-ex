@@ -1,13 +1,13 @@
 # PhotoMode-EX
 
-- Implements framework for adding custom characters
-- Adds character appearance selector
-- Adds "Look At Camera" preset selector
-- Adds "Snap To Terrain" mode selector
-- Adds rotation controls for 3 axes
+- Framework for adding custom characters
+- Character appearance selector
+- "Look At Camera" preset selector
+- "Snap To Terrain" mode selector
+- Rotation controls for 3 axes
 - Allows NPCs to use weapons from their own inventory
 - Enables NPCs in background mode
-- Enables alternative position controls
+- Enables alternative position controls (perfect positioning for groups poses)
 - Enables precise position inputs (step 0.01 instead of 0.05)
 - Remembers last used settings for "Depth Of Field", "Control Scheme", "Snap To Terrain" per save file
 
