@@ -889,7 +889,7 @@ void App::PhotoModeExService::OnSetupScrollBar(void* aCallback, uint64_t aEvent,
     case CharacterPositionFBAttribute:
     case CharacterPositionUDAttribute:
     {
-        aMinValue = std::min(aMaxValue, -3.0f);
+        aMinValue = std::min(aMinValue, -3.0f);
         aMaxValue = std::max(aMaxValue, 3.0f);
         aStep = 0.01;
         break;
