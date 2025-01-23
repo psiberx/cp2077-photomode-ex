@@ -3,8 +3,6 @@ module PhotoModeEx
 @wrapMethod(PhotoModePlayerEntityComponent)
 private final func FindMatchingEquipmentInEquipArea(area: gamedataEquipmentArea, typesList: array<gamedataItemType>) -> ItemID {
     if !this.customizable && Equals(area, gamedataEquipmentArea.WeaponWheel) {
-        P(s"\(this.fakePuppet.IsPlayer()) \(this.customizable)");
-
         let allItems: array<wref<gameItemData>>;
         let transactionSystem = GameInstance.GetTransactionSystem(this.mainPuppet.GetGame());
         transactionSystem.GetItemList(this.mainPuppet, allItems);
