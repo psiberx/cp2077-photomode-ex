@@ -15,11 +15,11 @@
 
 ### Compatibility
 
-- Cyberpunk 2077 2.2
+- Cyberpunk 2077 2.21
 
 ### Installation
 
 1. Install requirements:
-   - [RED4ext](https://docs.red4ext.com/getting-started/installing-red4ext) 1.26.1+
+   - [RED4ext](https://docs.red4ext.com/getting-started/installing-red4ext) 1.27.0+
    - [redscript](https://github.com/jac3km4/redscript) 0.5.27+
 2. Extract the release archive `PhotoModeEx-x.x.x.zip` into the Cyberpunk 2077 directory.

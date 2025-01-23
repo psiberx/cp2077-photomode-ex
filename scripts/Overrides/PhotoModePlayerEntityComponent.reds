@@ -1,16 +1,23 @@
 module PhotoModeEx
 
 @wrapMethod(PhotoModePlayerEntityComponent)
-private final func EquipWeaponOfThisType(typesList: array<gamedataItemType>) -> Void {
-    this.ListAllCurrentItems();
+private final func FindMatchingEquipmentInEquipArea(area: gamedataEquipmentArea, typesList: array<gamedataItemType>) -> ItemID {
+    if !this.customizable && Equals(area, gamedataEquipmentArea.WeaponWheel) {
+        P(s"\(this.fakePuppet.IsPlayer()) \(this.customizable)");
 
-    wrappedMethod(typesList);
-}
+        let allItems: array<wref<gameItemData>>;
+        let transactionSystem = GameInstance.GetTransactionSystem(this.mainPuppet.GetGame());
+        transactionSystem.GetItemList(this.mainPuppet, allItems);
 
-@wrapMethod(PhotoModePlayerEntityComponent)
-private final func ListAllCurrentItems() {
-    ArrayClear(this.availableCurrentItemsList);
-    this.TS.GetItemList(this.fakePuppet, this.availableCurrentItemsList);
+        let i = 0;
+        while i < ArraySize(allItems) {
+            let itemID = allItems[i].GetID();
+            if ItemID.IsValid(itemID) && this.IsItemOfThisType(itemID, typesList) {
+                return itemID;
+            }
+            i += 1;
+        }
+    }
 
-    wrappedMethod();
+    return wrappedMethod(area, typesList);
 }

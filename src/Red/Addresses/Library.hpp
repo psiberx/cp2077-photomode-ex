@@ -2,7 +2,7 @@
 
 namespace Red::AddressLib
 {
-constexpr uint32_t Main = 3545369307;
+constexpr uint32_t Main = 240386859;
 
 constexpr uint32_t EngineConfig_GetInstance = 3182170505;
 constexpr uint32_t EngineConfigStore_GetVar = 3758823966;
@@ -32,7 +32,7 @@ constexpr uint32_t PhotoModeSystem_UpdatePoseDependents = 231086722;
 constexpr uint32_t PhotoModeSystem_PrepareCategories = 1220162374;
 constexpr uint32_t PhotoModeSystem_PreparePoses = 1533423999;
 constexpr uint32_t PhotoModeSystem_PrepareCameras = 1972968407;
-constexpr uint32_t PhotoModeSystem_CalculateSpawnTransform = 3621919187;
+constexpr uint32_t PhotoModeSystem_CalculateSpawnTransform = 4059437596;
 constexpr uint32_t PhotoModeSystem_CalculateGroundOffset = 3498779312;
 constexpr uint32_t PhotoModeSystem_AdjustPuppetPosition = 2808687650;
 constexpr uint32_t PhotoModeSystem_SpawnCharacter = 3345561227;

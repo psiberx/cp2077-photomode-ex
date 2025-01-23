@@ -202,6 +202,8 @@ void App::PhotoModeExService::OnLoadTweakDB()
         expressionList.PushBack(true);
         collisionRadiusList.PushBack(0.35);
         collisionHeightList.PushBack(1.2);
+
+        LogInfo("Registered NPC: {}.", characterStr);
     }
 
     Red::SetFlat("photo_mode.npcs.npcRecordID", iconList);
@@ -889,13 +891,16 @@ void App::PhotoModeExService::OnSetupScrollBar(void* aCallback, uint64_t aEvent,
     case CharacterPositionFBAttribute:
     case CharacterPositionUDAttribute:
     {
-        aMinValue = std::min(aMinValue, -3.0f);
-        aMaxValue = std::max(aMaxValue, 3.0f);
+        aMinValue = std::min(std::max(aMinValue, -1.0f), -5.0f);
+        aMaxValue = std::max(std::min(aMaxValue, 1.0f), 5.0f);
         aStep = 0.01;
         break;
     }
     case PlayerYawAttribute:
     {
+        aMinValue = -180.0f;
+        aMaxValue = 180.0f;
+
         aAttribute = PlayerPitchAttribute;
         Raw::PhotoModeMenuController::SetupScrollBar(aCallback, aEvent, a3, aAttribute, aStartValue,
                                                      aMinValue, aMaxValue, aStep, aShowPercents);
@@ -909,6 +914,9 @@ void App::PhotoModeExService::OnSetupScrollBar(void* aCallback, uint64_t aEvent,
     }
     case CharacterYawAttribute:
     {
+        aMinValue = -180.0f;
+        aMaxValue = 180.0f;
+
         aAttribute = CharacterPitchAttribute;
         Raw::PhotoModeMenuController::SetupScrollBar(aCallback, aEvent, a3, aAttribute, aStartValue,
                                                      aMinValue, aMaxValue, aStep, aShowPercents);
