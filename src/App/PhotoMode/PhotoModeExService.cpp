@@ -32,6 +32,7 @@ constexpr uint32_t CharacterAppearanceAttribute = 3433u;
 
 constexpr Red::CName LookAtCameraTorsoPreset = "LookatPreset.PhotoMode_LookAtCamera";
 constexpr Red::CName LookAtCameraHeadPreset = "LookatPreset.PhotoMode_LookAtCamera_Head_Only";
+constexpr Red::CName LookAtCameraEyesPreset = "LookatPreset.Eyes";
 
 constexpr Red::TweakDBID WomanAverageID = "Character.Panam_Puppet_Photomode";
 constexpr Red::TweakDBID ManAverageID = "Character.Viktor_Puppet_Photomode";
@@ -88,6 +89,8 @@ void App::PhotoModeExService::OnBootstrap()
     HookBefore<Raw::PhotoModeMenuController::SetupScrollBar>(&OnSetupScrollBar).OrThrow();
     HookBefore<Raw::PhotoModeMenuController::ForceAttributeVaulue>(&OnForceAttributeVaulue).OrThrow();
     Hook<Raw::PhotoModeMenuController::SetNpcImageCallback>(&OnSetNpcImage).OrThrow();
+
+    Red::CNamePool::Add("LookatPreset.Eyes");
 }
 
 void App::PhotoModeExService::OnLoadTweakDB()
@@ -577,6 +580,10 @@ void App::PhotoModeExService::OnProcessAttribute(Red::gamePhotoModeSystem* aSyst
             {
                 player->lookAtCameraPreset = LookAtCameraHeadPreset;
             }
+            else if (state == 3.0)
+            {
+                player->lookAtCameraPreset = LookAtCameraEyesPreset;
+            }
             else
             {
                 player->lookAtCameraPreset = "";
@@ -603,6 +610,10 @@ void App::PhotoModeExService::OnProcessAttribute(Red::gamePhotoModeSystem* aSyst
                 else if (state == 2.0)
                 {
                     character->lookAtCameraPreset = LookAtCameraHeadPreset;
+                }
+                else if (state == 3.0)
+                {
+                    character->lookAtCameraPreset = LookAtCameraEyesPreset;
                 }
                 else
                 {
@@ -676,7 +687,7 @@ void App::PhotoModeExService::OnProcessAttribute(Red::gamePhotoModeSystem* aSyst
                 float value;
                 Raw::PhotoModeSystem::GetAttributeValue(aSystem, aAttribute, value);
 
-                auto appeanceIndex = static_cast<int32_t>(value);;
+                auto appeanceIndex = static_cast<int32_t>(value);
                 if (appeanceIndex >=0 && appeanceIndex < addon.appearanceNames.size())
                 {
                     addon.appeanceIndex = appeanceIndex;
@@ -850,6 +861,7 @@ void App::PhotoModeExService::OnSetupOptionSelector(void* aCallback, uint64_t aE
     case PlayerLookAtCameraAttribute:
     case CharacterLookAtCameraAttribute:
     {
+        std::string eyesPresetLabel = GetLocalizedText("UI-CharacterCreation-eyes").c_str();
         std::string headPresetLabel = GetLocalizedText("UI-ResourceExports-Head").c_str();
         std::string torsoPresetLabel = GetLocalizedText("UI-ResourceExports-Chest").c_str();
         torsoPresetLabel += " + " + headPresetLabel;
@@ -857,7 +869,7 @@ void App::PhotoModeExService::OnSetupOptionSelector(void* aCallback, uint64_t aE
         aElements.RemoveAt(1);
         aElements.PushBack({torsoPresetLabel, 1});
         aElements.PushBack({headPresetLabel, 2});
-        // aElements.PushBack({GetLocalizedText("UI-CharacterCreation-eyes"), 3});
+        aElements.PushBack({eyesPresetLabel, 3});
         break;
     }
     }
