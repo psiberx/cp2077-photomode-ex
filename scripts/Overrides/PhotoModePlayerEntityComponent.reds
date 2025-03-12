@@ -5,6 +5,7 @@ private final func FindMatchingEquipmentInEquipArea(area: gamedataEquipmentArea,
     if !this.customizable && Equals(area, gamedataEquipmentArea.WeaponWheel) {
         let allItems: array<wref<gameItemData>>;
         let transactionSystem = GameInstance.GetTransactionSystem(this.mainPuppet.GetGame());
+        transactionSystem.GetItemList(this.GetOwner(), allItems);
         transactionSystem.GetItemList(this.mainPuppet, allItems);
 
         let i = 0;
