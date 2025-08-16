@@ -20,57 +20,67 @@ struct PhotoModeCharacter
     uint32_t unk38;                                    // 38
     uint32_t unk3C;                                    // 40
     uint64_t unk40;                                    // 40
-    uint32_t characterIndex;                           // 48
-    PhotoModeCharacterType characterType;              // 4C
+    uint64_t unk48;                                    // 48
     uint64_t unk50;                                    // 50
-    uint8_t unk58;                                     // 58
-    uint8_t unk59;                                     // 59
-    uint8_t unk5A;                                     // 5A
-    uint8_t unk5B;                                     // 5B
-    uint32_t unk5C;                                    // 5C
-    uint8_t unk60;                                     // 60
-    uint8_t unk61;                                     // 61
-    uint8_t unk62;                                     // 62
-    uint8_t unk63;                                     // 63
-    uint64_t unk68;                                    // 68
-    uint64_t unk70;                                    // 70
-    Vector3 relativePosition;                          // 78
-    bool updateTransform;                              // 84
-    bool unk85;                                        // 85
-    uint8_t unk86;                                     // 86
-    uint8_t unk87;                                     // 87
-    uint64_t unk88;                                    // 88
-    uint64_t unk90;                                    // 90
-    uint32_t unk98;                                    // 98
-    uint32_t unk9C;                                    // 9C
-    bool allowLookAtCamera;                            // A0
-    uint32_t unkA4;                                    // A4
+    uint32_t characterIndex;                           // 58
+    PhotoModeCharacterType characterType;              // 5C
+    uint64_t unk60;                                    // 60
+    uint8_t unk68;                                     // 68
+    uint8_t unk69;                                     // 69
+    uint8_t unk6A;                                     // 6A
+    uint8_t unk6B;                                     // 6B
+    uint32_t unk6C;                                    // 6C
+    uint8_t unk70;                                     // 70
+    uint8_t unk71;                                     // 71
+    uint8_t unk72;                                     // 72
+    uint8_t unk73;                                     // 73
+    uint64_t unk78;                                    // 78
+    uint64_t unk80;                                    // 80
+    Vector3 relativePosition;                          // 88
+    bool updateTransform;                              // 94
+    bool unk95;                                        // 95
+    uint8_t unk96;                                     // 96
+    uint8_t unk97;                                     // 97
+    uint64_t unk98;                                    // 98
+    uint64_t unkA0;                                    // A0
     uint32_t unkA8;                                    // A8
     uint32_t unkAC;                                    // AC
-    uint32_t unkB0;                                    // B0
+    bool allowLookAtCamera;                            // B0
     uint32_t unkB4;                                    // B4
     uint32_t unkB8;                                    // B8
-    bool unkBC;                                        // BC
-    CName lookAtCameraPreset;                          // C0
-    uint64_t unkC8;                                    // C8
-    uint64_t unkD0;                                    // D0
-    uint8_t unkD8;                                     // D8
-    float spawnedState;                                // DC
-    uint32_t unkE0;                                    // E0
-    uint32_t unkE4;                                    // E4
-    uint32_t unkE8;                                    // E8
-    float lootAtCameraState;                           // EC
+    uint32_t unkBC;                                    // BC
+    uint32_t unkC0;                                    // C0
+    uint32_t unkC4;                                    // C4
+    uint32_t unkC8;                                    // C8
+    bool unkCC;                                        // CC
+    CName lookAtCameraPreset;                          // D0
+    uint64_t unkD8;                                    // D8
+    uint64_t unkE0;                                    // E0
+    uint8_t unkE8;                                     // E8
+    float spawnedState;                                // EC
     uint32_t unkF0;                                    // F0
-    float relativeRotation;                            // F4
-    float relativeOffsetRight;                         // F8
-    float relativeOffsetForward;                       // FC
-    Quaternion spawnOrientation;                       // 100
-    Vector3 spawnPosition;                             // 110
-    uint32_t state;                                    // 11C
+    uint32_t unkF4;                                    // F4
+    uint32_t unkF8;                                    // F8
+    float lootAtCameraState;                           // FC
+    uint32_t unk100;                                   // 100
+    float relativeRotation;                            // 104
+    float relativeOffsetRight;                         // 108
+    float relativeOffsetForward;                       // 10C
+    Quaternion spawnOrientation;                       // 110
+    Vector3 spawnPosition;                             // 120
+    uint32_t state;                                    // 12C
+    uint8_t unk[0x190-0x130];
 };
-RED4EXT_ASSERT_SIZE(PhotoModeCharacter, 0x120);
-RED4EXT_ASSERT_OFFSET(PhotoModeCharacter, characterIndex, 0x48);
-RED4EXT_ASSERT_OFFSET(PhotoModeCharacter, lookAtCameraPreset, 0xC0);
+RED4EXT_ASSERT_SIZE(PhotoModeCharacter, 0x190);
+RED4EXT_ASSERT_OFFSET(PhotoModeCharacter, puppet, 0x0);
+RED4EXT_ASSERT_OFFSET(PhotoModeCharacter, characterIndex, 0x58);
+RED4EXT_ASSERT_OFFSET(PhotoModeCharacter, characterType, 0x5C);
+RED4EXT_ASSERT_OFFSET(PhotoModeCharacter, relativePosition, 0x88);
+RED4EXT_ASSERT_OFFSET(PhotoModeCharacter, updateTransform, 0x94);
+RED4EXT_ASSERT_OFFSET(PhotoModeCharacter, lookAtCameraPreset, 0xD0);
+RED4EXT_ASSERT_OFFSET(PhotoModeCharacter, spawnOrientation, 0x110);
+RED4EXT_ASSERT_OFFSET(PhotoModeCharacter, spawnPosition, 0x120);
+RED4EXT_ASSERT_OFFSET(PhotoModeCharacter, state, 0x12C);
 }
 
 namespace Raw::PhotoModeSystem
@@ -81,8 +91,8 @@ using Player = Core::OffsetPtr<0x140, Red::PhotoModeCharacter*>;
 using CharacterList = Core::OffsetPtr<0x180, Red::DynArray<Red::PhotoModeCharacter>>;
 using CharacterBgOffset = Core::OffsetPtr<0x1C0, Red::Vector3>;
 using SpawnList = Core::OffsetPtr<0x1D0, Red::PhotoModeCharacter*[3]>;
-using SpawnSlot = Core::OffsetPtr<0x3A0, uint32_t>;
-using EditSlot = Core::OffsetPtr<0x39C, uint32_t>;
+using EditSlot = Core::OffsetPtr<0x36C, uint32_t>;
+using SpawnSlot = Core::OffsetPtr<0x370, uint32_t>;
 
 constexpr auto Activate = Core::RawFunc<
     /* addr = */ Red::AddressLib::PhotoModeSystem_Activate,
@@ -176,7 +186,7 @@ constexpr auto AdjustPuppetPosition = Core::RawFunc<
 constexpr auto SpawnCharacter = Core::RawFunc<
     /* addr = */ Red::AddressLib::PhotoModeSystem_SpawnCharacter,
     /* type = */ void (*)(Red::gamePhotoModeSystem* aSystem, Red::PhotoModeCharacter* aCharacter,
-                          uint32_t a3, const Red::Transform& aSpawnTransform, uint64_t a5)>();
+                          const Red::Transform& aSpawnTransform, uint64_t a5)>();
 
 constexpr auto ApplyPuppetTransforms = Core::RawFunc<
     /* addr = */ Red::AddressLib::PhotoModeSystem_ApplyPuppetTransforms,
@@ -185,7 +195,7 @@ constexpr auto ApplyPuppetTransforms = Core::RawFunc<
 
 constexpr auto SetRelativePosition = Core::RawFunc<
     /* addr = */ Red::AddressLib::PhotoModeSystem_SetRelativePosition,
-    /* type = */ void (*)(Red::gamePhotoModeSystem *aSystem, uint8_t a2, uint8_t aCharacterGroup)>();
+    /* type = */ void (*)(Red::gamePhotoModeSystem *aSystem, void* a2, uint8_t a3, uint8_t aCharacterGroup)>();
 
 constexpr auto SyncRelativePosition = Core::RawFunc<
     /* addr = */ Red::AddressLib::PhotoModeSystem_SyncRelativePosition,

@@ -50,12 +50,12 @@ protected:
                                        Red::PhotoModeCharacter* aCharacter);
     static void OnCalculateSpawnTransform(Red::gamePhotoModeSystem* aSystem, Red::Transform& aSpawnTransform,
                                           const Red::Transform& aInitialTransform, uint64_t* a4, bool a5);
-    static void OnSpawnCharacter(Red::gamePhotoModeSystem* aSystem, Red::PhotoModeCharacter* aCharacter, uint32_t a3,
+    static void OnSpawnCharacter(Red::gamePhotoModeSystem* aSystem, Red::PhotoModeCharacter* aCharacter,
                                  const Red::Transform& aSpawnTransform, uint64_t a5);
     static void OnApplyPuppetTransforms(Red::gamePhotoModeSystem* aSystem,
                                         Red::DynArray<Red::PhotoModeCharacter>& aCharacterList,
                                         uint8_t aCharacterGroup);
-    static void OnSetRelativePosition(Red::gamePhotoModeSystem* aSystem, uint8_t a2, uint8_t aCharacterGroup);
+    static void OnSetRelativePosition(Red::gamePhotoModeSystem* aSystem, void* a2, uint8_t a3, uint8_t aCharacterGroup);
     static void FixRelativePosition(Red::PhotoModeCharacter* aCharacter);
     static void OnSyncRelativePosition(Red::gamePhotoModeSystem* aSystem);
     static void OnProcessAttribute(Red::gamePhotoModeSystem* aSystem, uint32_t aAttribute);
@@ -87,12 +87,13 @@ protected:
     static inline Red::gamePhotoModeSystem* s_photoModeSystem;
     static inline Red::gameuiPhotoModeMenuController* s_photoModeController;
     static inline Core::Map<uint32_t, CharacterAddon> s_characterAddons;
+    static inline Red::Transform s_playerSpawnTransform;
     static inline bool s_initialized;
 
     static inline Core::SortedMap<uint32_t, CharacterSource> s_extraCharacters;
     static inline Core::SortedMap<Red::TweakDBID, uint32_t> s_characterIndexMap;
     static inline Core::SortedMap<uint32_t, Red::TweakDBID> s_characterRecordMap;
-    static inline uint32_t s_dummyCharacterIndex{0};
-    static inline uint32_t s_maxCharacterIndex{0};
+    static inline int32_t s_dummyCharacterIndex{0};
+    static inline int32_t s_maxCharacterIndex{0};
 };
 }

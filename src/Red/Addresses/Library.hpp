@@ -9,7 +9,7 @@ constexpr uint32_t EngineConfigStore_GetVar = 3758823966;
 
 constexpr uint32_t PhotoModeMenuController_AddMenuItem = 3959824448;
 constexpr uint32_t PhotoModeMenuController_SetAttributeEnabled = 1413222104;
-constexpr uint32_t PhotoModeMenuController_SetupScrollBar = 50470660;
+constexpr uint32_t PhotoModeMenuController_SetupScrollBar = 1717706078;
 constexpr uint32_t PhotoModeMenuController_SetupOptionSelector = 4152117147;
 constexpr uint32_t PhotoModeMenuController_SetupGridSelector = 3755427483;
 constexpr uint32_t PhotoModeMenuController_ForceAttributeVaulue = 1408114049;
@@ -35,9 +35,9 @@ constexpr uint32_t PhotoModeSystem_PrepareCameras = 1972968407;
 constexpr uint32_t PhotoModeSystem_CalculateSpawnTransform = 4059437596;
 constexpr uint32_t PhotoModeSystem_CalculateGroundOffset = 3498779312;
 constexpr uint32_t PhotoModeSystem_AdjustPuppetPosition = 2808687650;
-constexpr uint32_t PhotoModeSystem_SpawnCharacter = 3345561227;
+constexpr uint32_t PhotoModeSystem_SpawnCharacter = 978529375;
 constexpr uint32_t PhotoModeSystem_ApplyPuppetTransforms = 2694650124;
-constexpr uint32_t PhotoModeSystem_SetRelativePosition = 3157463382;
+constexpr uint32_t PhotoModeSystem_SetRelativePosition = 1847598004;
 constexpr uint32_t PhotoModeSystem_SyncRelativePosition = 4175827669;
 
 constexpr uint32_t TweakDB_Load = 3602585178; // game::data::TweakDB::LoadOptimized

@@ -21,6 +21,7 @@ constexpr uint32_t CharacterPickAttribute = 63u;
 constexpr uint32_t CharacterPositionUDAttribute = 66u;
 constexpr uint32_t CharacterFirstAttribute = 67u;
 constexpr uint32_t CharacterEditAttribute = 68u;
+constexpr uint32_t CharacterOutfitAttribute = 82u;
 
 constexpr uint32_t ControlSchemaAttribute = 3401u;
 constexpr uint32_t SnapToTerrainAttribute = 3402u;
@@ -90,7 +91,7 @@ void App::PhotoModeExService::OnBootstrap()
     HookBefore<Raw::PhotoModeMenuController::ForceAttributeVaulue>(&OnForceAttributeVaulue).OrThrow();
     Hook<Raw::PhotoModeMenuController::SetNpcImageCallback>(&OnSetNpcImage).OrThrow();
 
-    Red::CNamePool::Add("LookatPreset.Eyes");
+    // Red::CNamePool::Add("LookatPreset.Eyes");
 }
 
 void App::PhotoModeExService::OnLoadTweakDB()
@@ -121,6 +122,9 @@ void App::PhotoModeExService::OnLoadTweakDB()
         auto persistentName = Red::GetFlat<Red::CName>({characterID, ".persistentName"});
 
         if (persistentName != "PhotomodePuppet")
+            continue;
+
+        if (!Red::RecordExists({characterID, ".icon"}))
             continue;
 
         if (s_characterIndexMap.contains(characterID))
@@ -206,7 +210,7 @@ void App::PhotoModeExService::OnLoadTweakDB()
         collisionRadiusList.PushBack(0.35);
         collisionHeightList.PushBack(1.2);
 
-        LogInfo("Registered NPC: {}.", characterStr);
+        LogInfo("Registered NPC \"{}\" at index {}.", characterStr, characterIndex);
     }
 
     Red::SetFlat("photo_mode.npcs.npcRecordID", iconList);
@@ -373,15 +377,19 @@ void App::PhotoModeExService::OnCalculateSpawnTransform(Red::gamePhotoModeSystem
 {
     if (s_persistentState->alternativeControls)
     {
-        aSpawnTransform = aInitialTransform;
+        aSpawnTransform = s_playerSpawnTransform;
     }
 }
 
 void App::PhotoModeExService::OnSpawnCharacter(Red::gamePhotoModeSystem* aSystem, Red::PhotoModeCharacter* aCharacter,
-                                               uint32_t a3, const Red::Transform& aSpawnTransform, uint64_t a5)
+                                               const Red::Transform& aSpawnTransform, uint64_t a5)
 {
     if (aCharacter->characterType != Red::PhotoModeCharacterType::NPC)
+    {
+        s_playerSpawnTransform.position = aCharacter->spawnPosition;
+        s_playerSpawnTransform.orientation = aCharacter->spawnOrientation;
         return;
+    }
 
     if (s_persistentState->alternativeControls)
     {
@@ -507,14 +515,14 @@ void App::PhotoModeExService::OnApplyPuppetTransforms(Red::gamePhotoModeSystem* 
     }
 }
 
-void App::PhotoModeExService::OnSetRelativePosition(Red::gamePhotoModeSystem* aSystem, uint8_t a2,
+void App::PhotoModeExService::OnSetRelativePosition(Red::gamePhotoModeSystem* aSystem, void* a2, uint8_t a3,
                                                     uint8_t aCharacterGroup)
 {
     if (s_persistentState->alternativeControls)
     {
         if (aCharacterGroup == 0)
         {
-            auto* player = Raw::PhotoModeSystem::Player::Ptr(aSystem);
+            auto* player = Raw::PhotoModeSystem::Player::Ref(aSystem);
             if (player && player->puppet && player->puppet->transformComponent && player->updateTransform)
             {
                 FixRelativePosition(player);
@@ -564,68 +572,68 @@ void App::PhotoModeExService::OnProcessAttribute(Red::gamePhotoModeSystem* aSyst
 
     switch (aAttribute)
     {
-    case PlayerLookAtCameraAttribute:
-    {
-        auto* player = Raw::PhotoModeSystem::Player::Ptr(aSystem);
-        if (player && player->spawnedState > 0.0)
-        {
-            float state;
-            Raw::PhotoModeSystem::GetAttributeValue(aSystem, aAttribute, state);
-
-            if (state == 1.0)
-            {
-                player->lookAtCameraPreset = LookAtCameraTorsoPreset;
-            }
-            else if (state == 2.0)
-            {
-                player->lookAtCameraPreset = LookAtCameraHeadPreset;
-            }
-            else if (state == 3.0)
-            {
-                player->lookAtCameraPreset = LookAtCameraEyesPreset;
-            }
-            else
-            {
-                player->lookAtCameraPreset = "";
-            }
-        }
-        break;
-    }
-    case CharacterLookAtCameraAttribute:
-    {
-        auto& spawnList = Raw::PhotoModeSystem::SpawnList::Ref(aSystem);
-        auto& spawnSlot = Raw::PhotoModeSystem::SpawnSlot::Ref(aSystem);
-        if (spawnSlot >= 0 && spawnSlot <= 2)
-        {
-            auto character = spawnList[spawnSlot];
-            if (character && character->spawnedState > 0.0)
-            {
-                float state;
-                Raw::PhotoModeSystem::GetAttributeValue(aSystem, aAttribute, state);
-
-                if (state == 1.0)
-                {
-                    character->lookAtCameraPreset = LookAtCameraTorsoPreset;
-                }
-                else if (state == 2.0)
-                {
-                    character->lookAtCameraPreset = LookAtCameraHeadPreset;
-                }
-                else if (state == 3.0)
-                {
-                    character->lookAtCameraPreset = LookAtCameraEyesPreset;
-                }
-                else
-                {
-                    character->lookAtCameraPreset = "";
-                }
-            }
-        }
-        break;
-    }
+    // case PlayerLookAtCameraAttribute:
+    // {
+    //     auto* player = Raw::PhotoModeSystem::Player::Ref(aSystem);
+    //     if (player && player->spawnedState > 0.0)
+    //     {
+    //         float state;
+    //         Raw::PhotoModeSystem::GetAttributeValue(aSystem, aAttribute, state);
+    //
+    //         if (state == 1.0)
+    //         {
+    //             player->lookAtCameraPreset = LookAtCameraTorsoPreset;
+    //         }
+    //         else if (state == 2.0)
+    //         {
+    //             player->lookAtCameraPreset = LookAtCameraHeadPreset;
+    //         }
+    //         else if (state == 3.0)
+    //         {
+    //             player->lookAtCameraPreset = LookAtCameraEyesPreset;
+    //         }
+    //         else
+    //         {
+    //             player->lookAtCameraPreset = "";
+    //         }
+    //     }
+    //     break;
+    // }
+    // case CharacterLookAtCameraAttribute:
+    // {
+    //     auto& spawnList = Raw::PhotoModeSystem::SpawnList::Ref(aSystem);
+    //     auto& spawnSlot = Raw::PhotoModeSystem::SpawnSlot::Ref(aSystem);
+    //     if (spawnSlot >= 0 && spawnSlot <= 2)
+    //     {
+    //         auto character = spawnList[spawnSlot];
+    //         if (character && character->spawnedState > 0.0)
+    //         {
+    //             float state;
+    //             Raw::PhotoModeSystem::GetAttributeValue(aSystem, aAttribute, state);
+    //
+    //             if (state == 1.0)
+    //             {
+    //                 character->lookAtCameraPreset = LookAtCameraTorsoPreset;
+    //             }
+    //             else if (state == 2.0)
+    //             {
+    //                 character->lookAtCameraPreset = LookAtCameraHeadPreset;
+    //             }
+    //             else if (state == 3.0)
+    //             {
+    //                 character->lookAtCameraPreset = LookAtCameraEyesPreset;
+    //             }
+    //             else
+    //             {
+    //                 character->lookAtCameraPreset = "";
+    //             }
+    //         }
+    //     }
+    //     break;
+    // }
     case PlayerYawAttribute:
     {
-        auto* player = Raw::PhotoModeSystem::Player::Ptr(aSystem);
+        auto* player = Raw::PhotoModeSystem::Player::Ref(aSystem);
         if (player)
         {
             Raw::PhotoModeSystem::GetAttributeValue(aSystem, aAttribute, player->relativeRotation);
@@ -637,7 +645,7 @@ void App::PhotoModeExService::OnProcessAttribute(Red::gamePhotoModeSystem* aSyst
     case PlayerPitchAttribute:
     case PlayerRollAttribute:
     {
-        auto* player = Raw::PhotoModeSystem::Player::Ptr(aSystem);
+        auto* player = Raw::PhotoModeSystem::Player::Ref(aSystem);
         if (player)
         {
             auto& addon = s_characterAddons[player->characterIndex];
@@ -831,6 +839,11 @@ void App::PhotoModeExService::OnSetAttributeEnabled(Red::gameuiPhotoModeMenuCont
         Raw::PhotoModeMenuController::SetAttributeEnabled(aController, CharacterAppearanceAttribute, aEnabled);
         break;
     }
+    case CharacterOutfitAttribute:
+    {
+        Raw::PhotoModeMenuController::SetAttributeEnabled(aController, CharacterOutfitAttribute, false);
+        break;
+    }
     }
 }
 
@@ -858,20 +871,20 @@ void App::PhotoModeExService::OnSetupOptionSelector(void* aCallback, uint64_t aE
         aAttribute = DepthOfFieldAttribute;
         break;
     }
-    case PlayerLookAtCameraAttribute:
-    case CharacterLookAtCameraAttribute:
-    {
-        std::string eyesPresetLabel = GetLocalizedText("UI-CharacterCreation-eyes").c_str();
-        std::string headPresetLabel = GetLocalizedText("UI-ResourceExports-Head").c_str();
-        std::string torsoPresetLabel = GetLocalizedText("UI-ResourceExports-Chest").c_str();
-        torsoPresetLabel += " + " + headPresetLabel;
-
-        aElements.RemoveAt(1);
-        aElements.PushBack({torsoPresetLabel, 1});
-        aElements.PushBack({headPresetLabel, 2});
-        aElements.PushBack({eyesPresetLabel, 3});
-        break;
-    }
+    // case PlayerLookAtCameraAttribute:
+    // case CharacterLookAtCameraAttribute:
+    // {
+    //     std::string eyesPresetLabel = GetLocalizedText("UI-CharacterCreation-eyes").c_str();
+    //     std::string headPresetLabel = GetLocalizedText("UI-ResourceExports-Head").c_str();
+    //     std::string torsoPresetLabel = GetLocalizedText("UI-ResourceExports-Chest").c_str();
+    //     torsoPresetLabel += " + " + headPresetLabel;
+    //
+    //     aElements.RemoveAt(1);
+    //     aElements.PushBack({torsoPresetLabel, 1});
+    //     aElements.PushBack({headPresetLabel, 2});
+    //     aElements.PushBack({eyesPresetLabel, 3});
+    //     break;
+    // }
     }
 }
 
@@ -888,6 +901,20 @@ void App::PhotoModeExService::OnSetupGridSelector(void* aCallback, uint64_t aEve
             aElements.RemoveAt(s_dummyCharacterIndex - 1);
         }
     }
+}
+
+void App::PhotoModeExService::OnSetNpcImage(void* aCallback, uint32_t aCharacterIndex, Red::ResourcePath aAtlasPath,
+                                            Red::CName aImagePart, int32_t aImageIndex)
+{
+    if (s_dummyCharacterIndex)
+    {
+        if (aImageIndex >= s_dummyCharacterIndex)
+        {
+            aImageIndex -= DummyCharacterSlots;
+        }
+    }
+
+    Raw::PhotoModeMenuController::SetNpcImageCallback(aCallback, aCharacterIndex, aAtlasPath, aImagePart, aImageIndex);
 }
 
 void App::PhotoModeExService::OnSetupScrollBar(void* aCallback, uint64_t aEvent,
@@ -959,20 +986,6 @@ void App::PhotoModeExService::OnForceAttributeVaulue(void* aCallback, uint64_t a
         aAttribute = DepthOfFieldAttribute;
         aValue = s_persistentState->depthOfField ? 1.0f : 0.0f;
     }
-}
-
-void App::PhotoModeExService::OnSetNpcImage(void* aCallback, uint32_t aCharacterIndex, Red::ResourcePath aAtlasPath,
-                                            Red::CName aImagePart, int32_t aImageIndex)
-{
-    if (s_dummyCharacterIndex)
-    {
-        if (aImageIndex >= s_dummyCharacterIndex)
-        {
-            aImageIndex -= DummyCharacterSlots;
-        }
-    }
-
-    Raw::PhotoModeMenuController::SetNpcImageCallback(aCallback, aCharacterIndex, aAtlasPath, aImagePart, aImageIndex);
 }
 
 void App::PhotoModeExService::UpdateAppearanceList(uint32_t aCharacterIndex)
