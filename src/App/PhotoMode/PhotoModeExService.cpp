@@ -96,6 +96,8 @@ void App::PhotoModeExService::OnBootstrap()
 
 void App::PhotoModeExService::OnLoadTweakDB()
 {
+    auto depot = Red::ResourceDepot::Get();
+
     auto iconList = Red::GetFlat<Red::DynArray<Red::CString>>("photo_mode.npcs.npcRecordID");
     auto puppetList = Red::GetFlat<Red::DynArray<Red::CString>>("photo_mode.general.recordIDForPhotoModePuppet");
     auto nameList = Red::GetFlat<Red::DynArray<Red::CString>>("photo_mode.general.localizedNameForPhotoModePuppet");
@@ -119,18 +121,29 @@ void App::PhotoModeExService::OnLoadTweakDB()
     for (const auto& characterRecord : Red::GetRecords<Red::gamedataCharacter_Record>())
     {
         auto characterID = characterRecord->recordID;
+
+        if (s_characterIndexMap.contains(characterID))
+            continue;
+
         auto persistentName = Red::GetFlat<Red::CName>({characterID, ".persistentName"});
 
         if (persistentName != "PhotomodePuppet")
             continue;
 
-        if (!Red::RecordExists({characterID, ".icon"}))
-            continue;
-
-        if (s_characterIndexMap.contains(characterID))
-            continue;
-
         auto characterStr = Red::ToStringDebug(characterID);
+        auto templatePath = Red::GetFlat<Red::ResourcePath>({characterID, ".entityTemplatePath"});
+
+        if (!depot->ResourceExists(templatePath))
+        {
+            LogError("Cannot register character \"{}\": entity template doesn't exist.", characterStr.c_str());
+            continue;
+        }
+
+        if (!Red::RecordExists({characterID, ".icon"}))
+        {
+            LogError("Cannot register character \"{}\": icon is not defined.", characterStr.c_str());
+            continue;
+        }
 
         addedCharacterRecords[characterStr.c_str()] = characterRecord;
     }
@@ -210,7 +223,7 @@ void App::PhotoModeExService::OnLoadTweakDB()
         collisionRadiusList.PushBack(0.35);
         collisionHeightList.PushBack(1.2);
 
-        LogInfo("Registered NPC \"{}\" at index {}.", characterStr, characterIndex);
+        LogInfo("Registered new character \"{}\" at index {}.", characterStr, characterIndex);
     }
 
     Red::SetFlat("photo_mode.npcs.npcRecordID", iconList);
@@ -354,11 +367,11 @@ void App::PhotoModeExService::OnUpdatePoseDependents(Red::gamePhotoModeSystem* a
         aCharacter->characterIndex = extracCharacter->second.index;
     }
 
-    auto lookAtCameraPreset = aCharacter->lookAtCameraPreset;
-    if (!lookAtCameraPreset)
-    {
-        lookAtCameraPreset = LookAtCameraTorsoPreset;
-    }
+    // auto lookAtCameraPreset = aCharacter->lookAtCameraPreset;
+    // if (!lookAtCameraPreset)
+    // {
+    //     lookAtCameraPreset = LookAtCameraTorsoPreset;
+    // }
 
     Raw::PhotoModeSystem::UpdatePoseDependents(aSystem, aCategoryIndex, aPoseIndex, aCharacter);
 
@@ -367,8 +380,8 @@ void App::PhotoModeExService::OnUpdatePoseDependents(Red::gamePhotoModeSystem* a
         aCharacter->characterIndex = extracCharacter->first;
     }
 
-    aCharacter->allowLookAtCamera = true;
-    aCharacter->lookAtCameraPreset = lookAtCameraPreset;
+    // aCharacter->allowLookAtCamera = true;
+    // aCharacter->lookAtCameraPreset = lookAtCameraPreset;
 }
 
 void App::PhotoModeExService::OnCalculateSpawnTransform(Red::gamePhotoModeSystem* aSystem,
