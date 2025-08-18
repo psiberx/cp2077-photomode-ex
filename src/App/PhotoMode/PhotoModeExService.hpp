@@ -36,16 +36,18 @@ protected:
     static void OnActivate(Red::gamePhotoModeSystem* aSystem);
     static void OnFinalize(Red::gamePhotoModeSystem* aSystem);
     static void OnDeactivate(Red::gamePhotoModeSystem* aSystem);
-    static bool OnValidateCharacter(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex);
     static void OnRegisterPoses(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex,
                                 Red::PhotoModeCharacterType aCharacterType);
     static void OnRegisterWeaponPoses(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex,
                                       Red::DynArray<Red::gamedataItemType>& aItemTypes);
     static void OnPrepareCategories(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex, uint64_t a3);
     static void OnPreparePoses(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex, uint32_t aCategoryIndex,
-                               uint64_t a4);
-    static void OnPrepareCameras(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex, uint32_t* a3,
-                                 uint32_t* a4);
+                               Red::DynArray<Red::gameuiPhotoModeOptionSelectorData>& aOutPoses);
+    static void OnResolveCurrentPose(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex,
+                                     uint32_t* aOutCategoryIndex, uint32_t* aOutPoseIndex);
+    static uint64_t OnGetAvailableCategoriesCount(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex);
+    static uint64_t OnGetAvailablePosesCount(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex,
+                                            uint32_t aCategoryIndex);
     static void OnUpdatePoseDependents(Red::gamePhotoModeSystem* aSystem, uint32_t aCategoryIndex, uint32_t aPoseIndex,
                                        Red::PhotoModeCharacter* aCharacter);
     static void OnCalculateSpawnTransform(Red::gamePhotoModeSystem* aSystem, Red::Transform& aSpawnTransform,

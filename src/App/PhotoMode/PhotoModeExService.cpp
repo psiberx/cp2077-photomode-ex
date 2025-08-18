@@ -4,6 +4,8 @@
 
 namespace
 {
+constexpr uint32_t PlayerCategoryAttribute = 5u;
+constexpr uint32_t PlayerPoseAttribute = 6u;
 constexpr uint32_t PlayerYawAttribute = 7u;
 constexpr uint32_t PlayerPositionLRAttribute = 8u;
 constexpr uint32_t PlayerPositionFBAttribute = 9u;
@@ -13,11 +15,13 @@ constexpr uint32_t BackgroundAttribute = 34u;
 constexpr uint32_t PlayerPositionUDAttribute = 37u;
 constexpr uint32_t CameraSpeedAttribute = 42u;
 constexpr uint32_t CharacterSpawnAttribute = 55u;
+constexpr uint32_t CharacterPoseAttribute = 57u;
 constexpr uint32_t CharacterLookAtCameraAttribute = 58u;
 constexpr uint32_t CharacterYawAttribute = 60u;
 constexpr uint32_t CharacterPositionLRAttribute = 61u;
 constexpr uint32_t CharacterPositionFBAttribute = 62u;
 constexpr uint32_t CharacterPickAttribute = 63u;
+constexpr uint32_t CharacterCategoryAttribute = 65u;
 constexpr uint32_t CharacterPositionUDAttribute = 66u;
 constexpr uint32_t CharacterFirstAttribute = 67u;
 constexpr uint32_t CharacterEditAttribute = 68u;
@@ -67,12 +71,13 @@ void App::PhotoModeExService::OnBootstrap()
     HookAfter<Raw::PhotoModeSystem::Activate>(&OnActivate).OrThrow();
     HookAfter<Raw::PhotoModeSystem::Finalize>(&OnFinalize).OrThrow();
     HookBefore<Raw::PhotoModeSystem::Deactivate>(&OnDeactivate).OrThrow();
-    Hook<Raw::PhotoModeSystem::ValidateCharacter>(&OnValidateCharacter).OrThrow();
     Hook<Raw::PhotoModeSystem::RegisterPoses>(&OnRegisterPoses).OrThrow();
     Hook<Raw::PhotoModeSystem::RegisterWeaponPoses>(&OnRegisterWeaponPoses).OrThrow();
     Hook<Raw::PhotoModeSystem::PrepareCategories>(&OnPrepareCategories).OrThrow();
     Hook<Raw::PhotoModeSystem::PreparePoses>(&OnPreparePoses).OrThrow();
-    Hook<Raw::PhotoModeSystem::PrepareCameras>(&OnPrepareCameras).OrThrow();
+    Hook<Raw::PhotoModeSystem::ResolveCurrentPose>(&OnResolveCurrentPose).OrThrow();
+    Hook<Raw::PhotoModeSystem::GetAvailableCategoriesCount>(&OnGetAvailableCategoriesCount).OrThrow();
+    Hook<Raw::PhotoModeSystem::GetAvailablePosesCount>(&OnGetAvailablePosesCount).OrThrow();
     Hook<Raw::PhotoModeSystem::UpdatePoseDependents>(&OnUpdatePoseDependents).OrThrow();
     HookAfter<Raw::PhotoModeSystem::CalculateSpawnTransform>(&OnCalculateSpawnTransform).OrThrow();
     Hook<Raw::PhotoModeSystem::AdjustPuppetPosition>(&OnAdjustPuppetPosition).OrThrow();
@@ -285,17 +290,6 @@ void App::PhotoModeExService::OnDeactivate(Red::gamePhotoModeSystem* aSystem)
     s_initialized = false;
 }
 
-bool App::PhotoModeExService::OnValidateCharacter(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex)
-{
-    auto extracCharacter = s_extraCharacters.find(aCharacterIndex);
-    if (extracCharacter != s_extraCharacters.end())
-    {
-        aCharacterIndex = extracCharacter->second.index;
-    }
-
-    return Raw::PhotoModeSystem::ValidateCharacter(aSystem, aCharacterIndex);
-}
-
 void App::PhotoModeExService::OnRegisterPoses(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex,
                                               Red::PhotoModeCharacterType aCharacterType)
 {
@@ -335,7 +329,8 @@ void App::PhotoModeExService::OnPrepareCategories(Red::gamePhotoModeSystem* aSys
 }
 
 void App::PhotoModeExService::OnPreparePoses(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex,
-                                             uint32_t aCategoryIndex, uint64_t a4)
+                                             uint32_t aCategoryIndex,
+                                             Red::DynArray<Red::gameuiPhotoModeOptionSelectorData>& aOutPoses)
 {
     auto extracCharacter = s_extraCharacters.find(aCharacterIndex);
     if (extracCharacter != s_extraCharacters.end())
@@ -343,11 +338,11 @@ void App::PhotoModeExService::OnPreparePoses(Red::gamePhotoModeSystem* aSystem, 
         aCharacterIndex = extracCharacter->second.index;
     }
 
-    Raw::PhotoModeSystem::PreparePoses(aSystem, aCharacterIndex, aCategoryIndex, a4);
+    Raw::PhotoModeSystem::PreparePoses(aSystem, aCharacterIndex, aCategoryIndex, aOutPoses);
 }
 
-void App::PhotoModeExService::OnPrepareCameras(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex,
-                                               uint32_t* a3, uint32_t* a4)
+void App::PhotoModeExService::OnResolveCurrentPose(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex,
+                                                   uint32_t* aOutCategoryIndex, uint32_t* aOutPoseIndex)
 {
     auto extracCharacter = s_extraCharacters.find(aCharacterIndex);
     if (extracCharacter != s_extraCharacters.end())
@@ -355,7 +350,31 @@ void App::PhotoModeExService::OnPrepareCameras(Red::gamePhotoModeSystem* aSystem
         aCharacterIndex = extracCharacter->second.index;
     }
 
-    Raw::PhotoModeSystem::PrepareCameras(aSystem, aCharacterIndex, a3, a4);
+    Raw::PhotoModeSystem::ResolveCurrentPose(aSystem, aCharacterIndex, aOutCategoryIndex, aOutPoseIndex);
+}
+
+uint64_t App::PhotoModeExService::OnGetAvailableCategoriesCount(Red::gamePhotoModeSystem* aSystem,
+                                                                uint32_t aCharacterIndex)
+{
+    auto extracCharacter = s_extraCharacters.find(aCharacterIndex);
+    if (extracCharacter != s_extraCharacters.end())
+    {
+        aCharacterIndex = extracCharacter->second.index;
+    }
+
+    return Raw::PhotoModeSystem::GetAvailableCategoriesCount(aSystem, aCharacterIndex);
+}
+
+uint64_t App::PhotoModeExService::OnGetAvailablePosesCount(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex,
+                                                           uint32_t aCategoryIndex)
+{
+    auto extracCharacter = s_extraCharacters.find(aCharacterIndex);
+    if (extracCharacter != s_extraCharacters.end())
+    {
+        aCharacterIndex = extracCharacter->second.index;
+    }
+
+    return Raw::PhotoModeSystem::GetAvailablePosesCount(aSystem, aCharacterIndex, aCategoryIndex);
 }
 
 void App::PhotoModeExService::OnUpdatePoseDependents(Red::gamePhotoModeSystem* aSystem, uint32_t aCategoryIndex,

@@ -24,7 +24,8 @@ struct PhotoModeCharacter
     uint64_t unk50;                                    // 50
     uint32_t characterIndex;                           // 58
     PhotoModeCharacterType characterType;              // 5C
-    uint64_t unk60;                                    // 60
+    gamedataItemType itemType;                         // 60
+    uint32_t unk64;                                    // 64
     uint8_t unk68;                                     // 68
     uint8_t unk69;                                     // 69
     uint8_t unk6A;                                     // 6A
@@ -44,7 +45,7 @@ struct PhotoModeCharacter
     uint64_t unk98;                                    // 98
     uint64_t unkA0;                                    // A0
     uint32_t unkA8;                                    // A8
-    uint32_t unkAC;                                    // AC
+    uint32_t categoryIndex;                            // AC
     bool allowLookAtCamera;                            // B0
     uint32_t unkB4;                                    // B4
     uint32_t unkB8;                                    // B8
@@ -58,8 +59,8 @@ struct PhotoModeCharacter
     uint64_t unkE0;                                    // E0
     uint8_t unkE8;                                     // E8
     float spawnedState;                                // EC
-    uint32_t unkF0;                                    // F0
-    uint32_t unkF4;                                    // F4
+    float categoryState;                               // F0
+    float poseState;                                   // F4
     uint32_t unkF8;                                    // F8
     float lootAtCameraState;                           // FC
     uint32_t unk100;                                   // 100
@@ -69,7 +70,9 @@ struct PhotoModeCharacter
     Quaternion spawnOrientation;                       // 110
     Vector3 spawnPosition;                             // 120
     uint32_t state;                                    // 12C
-    uint8_t unk[0x190-0x130];
+    uint8_t unk130[0x17C-0x130];                       // 130
+    int32_t unk17C;                                    // 17C
+    uint8_t unk180[0x190-0x180];                       // 180
 };
 RED4EXT_ASSERT_SIZE(PhotoModeCharacter, 0x190);
 RED4EXT_ASSERT_OFFSET(PhotoModeCharacter, puppet, 0x0);
@@ -127,10 +130,6 @@ constexpr auto RegisterCharacter = Core::RawFunc<
                           Red::DynArray<Red::gamedataItemType>& aItemTypes,
                           Red::DynArray<Red::Handle<Red::gameItemObject>>& aClothingItems)>();
 
-constexpr auto ValidateCharacter = Core::RawFunc<
-    /* addr = */ Red::AddressLib::PhotoModeSystem_ValidateCharacter,
-    /* type = */ bool (*)(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex)>();
-
 constexpr auto RegisterPoses = Core::RawFunc<
     /* addr = */ Red::AddressLib::PhotoModeSystem_RegisterPoses,
     /* type = */ void (*)(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex,
@@ -153,11 +152,20 @@ constexpr auto PrepareCategories = Core::RawFunc<
 constexpr auto PreparePoses = Core::RawFunc<
     /* addr = */ Red::AddressLib::PhotoModeSystem_PreparePoses,
     /* type = */ void (*)(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex, uint32_t aCategoryIndex,
-                          uint64_t a4)>();
+                          Red::DynArray<Red::gameuiPhotoModeOptionSelectorData>& aOutPoses)>();
 
-constexpr auto PrepareCameras = Core::RawFunc<
-    /* addr = */ Red::AddressLib::PhotoModeSystem_PrepareCameras,
-    /* type = */ void (*)(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex, uint32_t* a3, uint32_t* a4)>();
+constexpr auto ResolveCurrentPose = Core::RawFunc<
+    /* addr = */ Red::AddressLib::PhotoModeSystem_ResolveCurrentPose,
+    /* type = */ void (*)(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex,
+                          uint32_t* aOutCategoryIndex, uint32_t* aOutPoseIndex)>();
+
+constexpr auto GetAvailableCategoriesCount = Core::RawFunc<
+    /* addr = */ Red::AddressLib::PhotoModeSystem_GetAvailableCategoriesCount,
+    /* type = */ uint64_t (*)(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex)>();
+
+constexpr auto GetAvailablePosesCount = Core::RawFunc<
+    /* addr = */ Red::AddressLib::PhotoModeSystem_GetAvailablePosesCount,
+    /* type = */ uint64_t (*)(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex, uint32_t aCategoryIndex)>();
 
 constexpr auto UpdateCategoryDependents = Core::RawFunc<
     /* addr = */ Red::AddressLib::PhotoModeSystem_UpdateCategoryDependents,
