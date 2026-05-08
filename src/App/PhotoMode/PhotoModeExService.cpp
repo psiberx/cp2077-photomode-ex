@@ -113,7 +113,7 @@ void App::PhotoModeExService::OnLoadTweakDB()
     auto collisionRadiusList = Red::GetFlat<Red::DynArray<float>>("photo_mode.general.collisionRadiusForPhotoModePuppet");
     auto collisionHeightList = Red::GetFlat<Red::DynArray<float>>("photo_mode.general.collisionHeightForPhotoModePuppet");
 
-    for (uint32_t characterIndex = 0; characterIndex < puppetList.size; ++characterIndex)
+    for (uint32_t characterIndex = 0; characterIndex < puppetList.Size(); ++characterIndex)
     {
         auto characterID = Red::TweakDBID(puppetList[characterIndex].c_str());
 
@@ -157,7 +157,7 @@ void App::PhotoModeExService::OnLoadTweakDB()
         return;
 
     {
-        s_dummyCharacterIndex = puppetList.size;
+        s_dummyCharacterIndex = puppetList.Size();
 
         auto dummyName = "PhotoModeNpcs.DoNotTouch";
         Red::CreateRecord(dummyName, "PhotoModeSticker");
@@ -181,7 +181,7 @@ void App::PhotoModeExService::OnLoadTweakDB()
         auto characterID = characterRecord->recordID;
         auto persistentName = Red::GetFlat<Red::CName>({characterID, ".persistentName"});
 
-        auto characterIndex = puppetList.size;
+        auto characterIndex = puppetList.Size();
         auto characterSource = s_characterIndexMap[WomanAverageID];
         auto characterType = Red::PhotoModeCharacterType::NPC;
 
@@ -241,7 +241,7 @@ void App::PhotoModeExService::OnLoadTweakDB()
     Red::SetFlat("photo_mode.general.collisionRadiusForPhotoModePuppet", collisionRadiusList);
     Red::SetFlat("photo_mode.general.collisionHeightForPhotoModePuppet", collisionHeightList);
 
-    s_maxCharacterIndex = puppetList.size - 1;
+    s_maxCharacterIndex = puppetList.Size() - 1;
 }
 
 void App::PhotoModeExService::OnActivate(Red::gamePhotoModeSystem* aSystem)
@@ -251,7 +251,7 @@ void App::PhotoModeExService::OnActivate(Red::gamePhotoModeSystem* aSystem)
 
     auto& characterList = Raw::PhotoModeSystem::CharacterList::Ref(aSystem);
 
-    if (!characterList.size)
+    if (characterList.IsEmpty())
         return;
 
     for (const auto& [characterIndex, characterSource] : s_extraCharacters)
@@ -308,7 +308,7 @@ void App::PhotoModeExService::OnRegisterWeaponPoses(Red::gamePhotoModeSystem* aS
         aCharacterIndex = extracCharacter->second.index;
     }
 
-    if (aItemTypes.size == 0)
+    if (aItemTypes.IsEmpty())
     {
         FillWeaponTypes(aItemTypes);
     }
@@ -460,7 +460,7 @@ void App::PhotoModeExService::OnSpawnCharacter(Red::gamePhotoModeSystem* aSystem
     addon.relativePitch = 0;
     addon.relativeRoll = 0;
 
-    if (addon.appearanceOptions.size == 0)
+    if (addon.appearanceOptions.IsEmpty())
     {
         addon.appearanceOptions.PushBack({"default", 0});
 
@@ -470,7 +470,7 @@ void App::PhotoModeExService::OnSpawnCharacter(Red::gamePhotoModeSystem* aSystem
 
         auto templateToken = Red::ResourceLoader::Get()->LoadAsync<Red::entEntityTemplate>(templatePath);
         templateToken->OnLoaded([characterIndex](const Red::Handle<Red::entEntityTemplate>& aTemplate) {
-            if (aTemplate->appearances.size > 0)
+            if (!aTemplate->appearances.IsEmpty())
             {
                 auto& addon = s_characterAddons[characterIndex];
 
@@ -478,7 +478,7 @@ void App::PhotoModeExService::OnSpawnCharacter(Red::gamePhotoModeSystem* aSystem
                 addon.appearanceNames.clear();
                 addon.appearanceOptions.Clear();
 
-                for (int32_t optionIndex = 0; optionIndex < aTemplate->appearances.size; ++optionIndex)
+                for (int32_t optionIndex = 0; optionIndex < aTemplate->appearances.Size(); ++optionIndex)
                 {
                     auto appearanceName = aTemplate->appearances[optionIndex].name;
 
@@ -924,7 +924,7 @@ void App::PhotoModeExService::OnSetupGridSelector(void* aCallback, uint64_t aEve
                                                   Red::DynArray<Red::gameuiPhotoModeOptionGridButtonData>& aElements,
                                                   uint32_t& aElementsCount, uint32_t& aElementsInRow)
 {
-    if (aAttribute == CharacterPickAttribute && s_dummyCharacterIndex && aElements.size >= s_dummyCharacterIndex)
+    if (aAttribute == CharacterPickAttribute && s_dummyCharacterIndex && aElements.Size() >= s_dummyCharacterIndex)
     {
         aElementsCount -= DummyCharacterSlots;
 
