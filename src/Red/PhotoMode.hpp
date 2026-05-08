@@ -61,7 +61,7 @@ struct PhotoModeCharacter
     float spawnedState;                                // EC
     float categoryState;                               // F0
     float poseState;                                   // F4
-    uint32_t unkF8;                                    // F8
+    float faceState;                                   // F8
     float lootAtCameraState;                           // FC
     uint32_t unk100;                                   // 100
     float relativeRotation;                            // 104

@@ -962,9 +962,17 @@ void App::PhotoModeExService::OnSetupScrollBar(void* aCallback, uint64_t aEvent,
     case CharacterPositionFBAttribute:
     case CharacterPositionUDAttribute:
     {
+        if (auto* stepFlatPtr = Red::GetFlatPtr<float>("photo_mode.character.position_adjust_step"))
+        {
+            if (*stepFlatPtr > 0)
+            {
+                aStep = *stepFlatPtr;
+            }
+        }
+
         aMinValue = std::min(std::max(aMinValue, -1.0f), -5.0f);
         aMaxValue = std::max(std::min(aMaxValue, 1.0f), 5.0f);
-        aStep = 0.01;
+        aStep = std::min(std::max(aStep, 0.00001f), 0.01f);
         break;
     }
     case PlayerYawAttribute:
