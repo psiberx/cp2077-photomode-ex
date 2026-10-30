@@ -30,7 +30,7 @@ else
 end
 
 add_requires("hopscotch-map", "minhook", "spdlog", "tiltedcore")
-add_requireconfs("tiltedcore.mimalloc", {version = "2.x", override = true}) -- mimalloc 3.x no longer exports mi_malloc_size used by tiltedcore
+add_requireconfs("tiltedcore.mimalloc", {version = "2.x", override = true}) -- mimalloc 3.x dropped mi_malloc_size used by TiltedCore
 
 target("PhotoModeEx")
     set_default(true)
@@ -52,28 +52,28 @@ target("PhotoModeEx")
 
 target("RED4ext.SDK")
     set_default(false)
-    set_kind("static")
+    set_kind("headeronly")
     set_group("vendor")
     add_headerfiles("vendor/RED4ext.SDK/include/**.hpp")
     add_includedirs("vendor/RED4ext.SDK/include/", { public = true })
 
 target("nameof")
     set_default(false)
-    set_kind("static")
+    set_kind("headeronly")
     set_group("vendor")
     add_headerfiles("vendor/nameof/include/**.hpp")
     add_includedirs("vendor/nameof/include/", { public = true })
 
 target("semver")
     set_default(false)
-    set_kind("static")
+    set_kind("headeronly")
     set_group("vendor")
     add_headerfiles("vendor/semver/include/**.hpp")
     add_includedirs("vendor/semver/include/", { public = true })
 
 target("wil")
     set_default(false)
-    set_kind("static")
+    set_kind("headeronly")
     set_group("vendor")
     add_headerfiles("vendor/wil/include/**.h")
     add_includedirs("vendor/wil/include/", { public = true })
