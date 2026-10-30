@@ -30,6 +30,7 @@ else
 end
 
 add_requires("hopscotch-map", "minhook", "spdlog", "tiltedcore")
+add_requireconfs("tiltedcore.mimalloc", {version = "2.x", override = true}) -- mimalloc 3.x no longer exports mi_malloc_size used by tiltedcore
 
 target("PhotoModeEx")
     set_default(true)
