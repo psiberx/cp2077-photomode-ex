@@ -50,8 +50,9 @@ protected:
                                             uint32_t aCategoryIndex);
     static void OnUpdatePoseDependents(Red::gamePhotoModeSystem* aSystem, uint32_t aCategoryIndex, uint32_t aPoseIndex,
                                        Red::PhotoModeCharacter* aCharacter);
-    static void OnCalculateSpawnTransform(Red::gamePhotoModeSystem* aSystem, Red::Transform& aSpawnTransform,
-                                          const Red::Transform& aInitialTransform, uint64_t* a4, bool a5);
+    static Red::Vector3* OnCalculateSpawnOffset(Red::gamePhotoModeSystem* aSystem, Red::Vector3* aOffset,
+                                                const Red::Transform& aInitialTransform, float aDistance, bool a5,
+                                                uint32_t aSlot);
     static void OnSpawnCharacter(Red::gamePhotoModeSystem* aSystem, Red::PhotoModeCharacter* aCharacter,
                                  const Red::Transform& aSpawnTransform, uint64_t a5);
     static void OnApplyPuppetTransforms(Red::gamePhotoModeSystem* aSystem,
@@ -59,7 +60,7 @@ protected:
                                         uint8_t aCharacterGroup);
     static void OnSetRelativePosition(Red::gamePhotoModeSystem* aSystem, void* a2, uint8_t a3, uint8_t aCharacterGroup);
     static void FixRelativePosition(Red::PhotoModeCharacter* aCharacter);
-    static void OnSyncRelativePosition(Red::gamePhotoModeSystem* aSystem);
+    static void OnSyncRelativePosition(Red::gamePhotoModeSystem* aSystem, bool a2);
     static void OnProcessAttribute(Red::gamePhotoModeSystem* aSystem, uint32_t aAttribute);
     static void OnAddMenuItem(Red::gameuiPhotoModeMenuController* aController, Red::CName aEventName,
                               const Red::CString& aLabel, uint32_t aAttribute, uint32_t aPage);
@@ -90,6 +91,7 @@ protected:
     static inline Red::gameuiPhotoModeMenuController* s_photoModeController;
     static inline Core::Map<uint32_t, CharacterAddon> s_characterAddons;
     static inline Red::Transform s_playerSpawnTransform;
+    static inline bool s_playerSpawned;
     static inline bool s_initialized;
 
     static inline Core::SortedMap<uint32_t, CharacterSource> s_extraCharacters;

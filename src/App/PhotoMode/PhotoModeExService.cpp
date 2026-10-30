@@ -79,7 +79,7 @@ void App::PhotoModeExService::OnBootstrap()
     Hook<Raw::PhotoModeSystem::GetAvailableCategoriesCount>(&OnGetAvailableCategoriesCount).OrThrow();
     Hook<Raw::PhotoModeSystem::GetAvailablePosesCount>(&OnGetAvailablePosesCount).OrThrow();
     Hook<Raw::PhotoModeSystem::UpdatePoseDependents>(&OnUpdatePoseDependents).OrThrow();
-    HookAfter<Raw::PhotoModeSystem::CalculateSpawnTransform>(&OnCalculateSpawnTransform).OrThrow();
+    Hook<Raw::PhotoModeSystem::CalculateSpawnOffset>(&OnCalculateSpawnOffset).OrThrow();
     Hook<Raw::PhotoModeSystem::AdjustPuppetPosition>(&OnAdjustPuppetPosition).OrThrow();
     Hook<Raw::PhotoModeSystem::CalculateGroundOffset>(&OnCalculateGroundOffset).OrThrow();
     HookAfter<Raw::PhotoModeSystem::SpawnCharacter>(&OnSpawnCharacter).OrThrow();
@@ -262,7 +262,7 @@ void App::PhotoModeExService::OnActivate(Red::gamePhotoModeSystem* aSystem)
         FillWeaponTypes(itemTypes);
 
         Raw::PhotoModeSystem::RegisterCharacter(aSystem, characterIndex, characterList,
-                                                Red::PhotoModeCharacterType::NPC, itemTypes, clothingItems);
+                                                Red::PhotoModeCharacterType::NPC, true, itemTypes, clothingItems);
     }
 
     {
@@ -287,6 +287,7 @@ void App::PhotoModeExService::OnDeactivate(Red::gamePhotoModeSystem* aSystem)
     Red::EngineConfig::Get()->SetValue("SnapToTerrainIk", "Enabled", true);
 
     s_characterAddons.clear();
+    s_playerSpawned = false;
     s_initialized = false;
 }
 
@@ -403,14 +404,30 @@ void App::PhotoModeExService::OnUpdatePoseDependents(Red::gamePhotoModeSystem* a
     // aCharacter->lookAtCameraPreset = lookAtCameraPreset;
 }
 
-void App::PhotoModeExService::OnCalculateSpawnTransform(Red::gamePhotoModeSystem* aSystem,
-                                                        Red::Transform& aSpawnTransform,
-                                                        const Red::Transform& aInitialTransform, uint64_t* a4, bool a5)
+Red::Vector3* App::PhotoModeExService::OnCalculateSpawnOffset(Red::gamePhotoModeSystem* aSystem, Red::Vector3* aOffset,
+                                                              const Red::Transform& aInitialTransform, float aDistance,
+                                                              bool a5, uint32_t aSlot)
 {
+    auto* result = Raw::PhotoModeSystem::CalculateSpawnOffset(aSystem, aOffset, aInitialTransform, aDistance, a5, aSlot);
+
     if (s_persistentState->alternativeControls)
     {
-        aSpawnTransform = s_playerSpawnTransform;
+        // Spawn at the player spawn position, the same as the spawn transform override before 2.5
+        if (s_playerSpawned)
+        {
+            result->X = s_playerSpawnTransform.position.X - aInitialTransform.position.X;
+            result->Y = s_playerSpawnTransform.position.Y - aInitialTransform.position.Y;
+            result->Z = s_playerSpawnTransform.position.Z - aInitialTransform.position.Z;
+        }
+        else
+        {
+            result->X = 0;
+            result->Y = 0;
+            result->Z = 0;
+        }
     }
+
+    return result;
 }
 
 void App::PhotoModeExService::OnSpawnCharacter(Red::gamePhotoModeSystem* aSystem, Red::PhotoModeCharacter* aCharacter,
@@ -420,6 +437,7 @@ void App::PhotoModeExService::OnSpawnCharacter(Red::gamePhotoModeSystem* aSystem
     {
         s_playerSpawnTransform.position = aCharacter->spawnPosition;
         s_playerSpawnTransform.orientation = aCharacter->spawnOrientation;
+        s_playerSpawned = true;
         return;
     }
 
@@ -589,11 +607,11 @@ void App::PhotoModeExService::FixRelativePosition(Red::PhotoModeCharacter* aChar
     aCharacter->relativePosition.Z = pos.Z;
 }
 
-void App::PhotoModeExService::OnSyncRelativePosition(Red::gamePhotoModeSystem* aSystem)
+void App::PhotoModeExService::OnSyncRelativePosition(Red::gamePhotoModeSystem* aSystem, bool a2)
 {
     if (!s_persistentState->alternativeControls)
     {
-        Raw::PhotoModeSystem::SyncRelativePosition(aSystem);
+        Raw::PhotoModeSystem::SyncRelativePosition(aSystem, a2);
     }
 }
 

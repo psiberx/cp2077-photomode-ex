@@ -3,7 +3,7 @@
 void App::PhotoModeNpcPatch::OnBootstrap()
 {
     auto& code = Core::RawPtr<Red::AddressLib::PhotoModeSystem_ProcessAttribute, uint8_t[0x8000]>::Ref();
-    uint8_t op[] = {0x41, 0x8D, 0x44, 0x24, 0xFE, 0x83, 0xF8, 0x31};
+    uint8_t op[] = {0x41, 0x8D, 0x40, 0xFE, 0x83, 0xF8, 0x32};
     bool success = false;
 
     DWORD oldProtect = 0;
