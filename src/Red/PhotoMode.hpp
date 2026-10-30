@@ -94,8 +94,8 @@ using Player = Core::OffsetPtr<0x140, Red::PhotoModeCharacter*>;
 using CharacterList = Core::OffsetPtr<0x180, Red::DynArray<Red::PhotoModeCharacter>>;
 using CharacterBgOffset = Core::OffsetPtr<0x1C0, Red::Vector3>;
 using SpawnList = Core::OffsetPtr<0x1D0, Red::PhotoModeCharacter*[3]>;
-using EditSlot = Core::OffsetPtr<0x36C, uint32_t>;
-using SpawnSlot = Core::OffsetPtr<0x370, uint32_t>;
+using EditSlot = Core::OffsetPtr<0x370, uint32_t>;
+using SpawnSlot = Core::OffsetPtr<0x374, uint32_t>;
 
 constexpr auto Activate = Core::RawFunc<
     /* addr = */ Red::AddressLib::PhotoModeSystem_Activate,
@@ -123,10 +123,11 @@ constexpr auto ProcessAttribute = Core::RawFunc<
 
 constexpr auto RegisterCharacter = Core::RawFunc<
     /* addr = */ Red::AddressLib::PhotoModeSystem_RegisterCharacter,
-    /* type = */ bool (*)(Red::gamePhotoModeSystem* aSystem,
+    /* type = */ void (*)(Red::gamePhotoModeSystem* aSystem,
                           uint32_t aCharacterIndex,
                           Red::DynArray<Red::PhotoModeCharacter>& aCharacterList,
                           Red::PhotoModeCharacterType aCharacterType,
+                          bool aEnabled,
                           Red::DynArray<Red::gamedataItemType>& aItemTypes,
                           Red::DynArray<Red::Handle<Red::gameItemObject>>& aClothingItems)>();
 
@@ -167,20 +168,21 @@ constexpr auto GetAvailablePosesCount = Core::RawFunc<
     /* addr = */ Red::AddressLib::PhotoModeSystem_GetAvailablePosesCount,
     /* type = */ uint64_t (*)(Red::gamePhotoModeSystem* aSystem, uint32_t aCharacterIndex, uint32_t aCategoryIndex)>();
 
-constexpr auto UpdateCategoryDependents = Core::RawFunc<
-    /* addr = */ Red::AddressLib::PhotoModeSystem_UpdateCategoryDependents,
-    /* type = */ void (*)(Red::gamePhotoModeSystem* aSystem, uint32_t aCategoryIndex,
-                          Red::PhotoModeCharacter* aCharacter, uint64_t a4)>();
 
 constexpr auto UpdatePoseDependents = Core::RawFunc<
     /* addr = */ Red::AddressLib::PhotoModeSystem_UpdatePoseDependents,
     /* type = */ void (*)(Red::gamePhotoModeSystem* aSystem, uint32_t aCategoryIndex, uint32_t aPoseIndex,
                           Red::PhotoModeCharacter* aCharacter)>();
 
-constexpr auto CalculateSpawnTransform = Core::RawFunc<
-    /* addr = */ Red::AddressLib::PhotoModeSystem_CalculateSpawnTransform,
-    /* type = */ void (*)(Red::gamePhotoModeSystem* aSystem, Red::Transform& aSpawnTransform,
-                          const Red::Transform& aInitialTransform, uint64_t* a4, bool a5)>();
+
+// Since 2.5 the spawn transform is no longer calculated as a whole,
+// instead the game calculates an offset from the initial transform
+// and stores it as the character's relative position
+constexpr auto CalculateSpawnOffset = Core::RawFunc<
+    /* addr = */ Red::AddressLib::PhotoModeSystem_CalculateSpawnOffset,
+    /* type = */ Red::Vector3* (*)(Red::gamePhotoModeSystem* aSystem, Red::Vector3* aOffset,
+                                   const Red::Transform& aInitialTransform, float aDistance, bool a5,
+                                   uint32_t aSlot)>();
 
 constexpr auto CalculateGroundOffset = Core::RawFunc<
     /* addr = */ Red::AddressLib::PhotoModeSystem_CalculateGroundOffset,
@@ -207,7 +209,7 @@ constexpr auto SetRelativePosition = Core::RawFunc<
 
 constexpr auto SyncRelativePosition = Core::RawFunc<
     /* addr = */ Red::AddressLib::PhotoModeSystem_SyncRelativePosition,
-    /* type = */ void (*)(Red::gamePhotoModeSystem *aSystem)>();
+    /* type = */ void (*)(Red::gamePhotoModeSystem *aSystem, bool a2)>();
 }
 
 namespace Raw::PhotoModeMenuController
