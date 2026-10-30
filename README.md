@@ -21,5 +21,5 @@
 
 1. Install requirements:
    - [RED4ext](https://docs.red4ext.com/getting-started/installing-red4ext) 1.31.0+
-   - [redscript](https://github.com/jac3km4/redscript) 0.5.30+
+   - [redscript](https://github.com/jac3km4/redscript) 0.5.32+
 2. Extract the release archive `PhotoModeEx-x.x.x.zip` into the Cyberpunk 2077 directory.
